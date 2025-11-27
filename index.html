@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <title>UsedMarket — маркетплейс б/у вещей</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header__left">
+      <button class="logo" data-link="home" aria-label="На главную">
+        Used<span>Market</span>
+      </button>
+    </div>
+    <div class="app-header__center">
+      <form id="search-form" class="search" role="search" aria-label="Поиск объявлений">
+        <input
+          id="search-input"
+          class="search__input"
+          type="search"
+          placeholder="Поиск по заголовку или описанию..."
+          aria-label="Введите текст для поиска"
+        />
+        <select id="category-filter" class="search__select" aria-label="Фильтр по категории">
+          <option value="">Все категории</option>
+          <option value="electronics">Электроника</option>
+          <option value="fashion">Одежда и обувь</option>
+          <option value="home">Дом и быт</option>
+          <option value="auto">Авто</option>
+          <option value="other">Другое</option>
+        </select>
+        <select id="sort-select" class="search__select" aria-label="Сортировка по цене">
+          <option value="">Без сортировки</option>
+          <option value="price-asc">Цена: по возрастанию</option>
+          <option value="price-desc">Цена: по убыванию</option>
+        </select>
+      </form>
+    </div>
+    <div class="app-header__right">
+      <button id="new-ad-btn" class="btn btn--primary" data-link="new">
+        + Разместить объявление
+      </button>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Переключить тему">
+        🌙
+      </button>
+    </div>
+  </header>
+
+  <main id="app" class="app-main" aria-live="polite">
+    <!-- Контент роутера -->
+  </main>
+
+  <template id="card-template">
+    <article class="card" tabindex="0">
+      <button class="card__image-wrapper" type="button">
+        <img class="card__image" alt="Фото товара" loading="lazy" />
+      </button>
+      <div class="card__body">
+        <h2 class="card__title"></h2>
+        <p class="card__price"></p>
+        <p class="card__category"></p>
+        <p class="card__description card__description--truncate"></p>
+      </div>
+    </article>
+  </template>
+
+  <template id="gallery-image-template">
+    <button class="gallery__thumb" type="button">
+      <img alt="Фото товара" loading="lazy" />
+    </button>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
