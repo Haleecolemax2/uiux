@@ -677,19 +677,19 @@ function getPlaceholderImage() {
 }
 
 function setupHeaderEvents() {
-  const header = document;
-  header.querySelectorAll("[data-link='home']").forEach((btn) =>
-    btn.addEventListener("click", () => navigateTo("#/"))
-  );
-  header.querySelectorAll("[data-link='new']").forEach((btn) =>
-    btn.addEventListener("click", () => navigateTo("#/new"))
-  );
-  header.querySelectorAll("[data-link='account']").forEach((btn) =>
-    btn.addEventListener("click", () => navigateTo("#/account"))
-  );
-  header.querySelectorAll("[data-link='messages']").forEach((btn) =>
-    btn.addEventListener("click", () => navigateTo("#/messages"))
-  );
+  // Delegate clicks on elements that have `data-link` attribute.
+  // This is robust if header buttons are re-rendered or modified.
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest && e.target.closest("[data-link]");
+    if (!el) return;
+    const link = el.getAttribute("data-link");
+    if (!link) return;
+    e.preventDefault();
+    if (link === "home" || link === "back") return navigateTo("#/");
+    if (link === "new") return navigateTo("#/new");
+    if (link === "account") return navigateTo("#/account");
+    if (link === "messages") return navigateTo("#/messages");
+  });
 
   const searchForm = document.getElementById("search-form");
   if (searchForm) {
