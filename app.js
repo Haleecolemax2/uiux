@@ -188,13 +188,18 @@ function currentPath() {
 }
 
 function navigateTo(path, extraParams) {
-  const url = new URL(window.location.href);
-  url.hash = path;
   if (extraParams) {
     const query = new URLSearchParams(extraParams);
-    url.hash = `${path}?${query.toString()}`;
+    window.location.hash = `${path}?${query.toString()}`;
+  } else {
+    window.location.hash = path;
   }
-  window.location.replace(url.toString());
+  // ensure immediate render in case hashchange doesn't fire in some environments
+  try {
+    render();
+  } catch (e) {
+    // swallow — user-facing behavior should rely on hashchange as fallback
+  }
 }
 
 function render() {
