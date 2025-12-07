@@ -6,6 +6,8 @@ const routes = {
   "#/": renderHome,
   "#/new": renderNewAd,
   "#/ad": renderAdDetails,
+  "#/account": renderAccount,
+  "#/messages": renderMessages,
 };
 
 let ads = [];
@@ -20,6 +22,107 @@ function loadAds() {
   }
 }
 
+function renderAccount() {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <section class="page" aria-labelledby="account-title">
+      <div class="page__header">
+        <div>
+          <h1 id="account-title" class="page__title">Личный кабинет</h1>
+          <p class="page__subtitle">Здесь отображаются объявления, сохранённые в вашем браузере.</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--ghost" data-link="back">Назад</button>
+        </div>
+      </div>
+
+      <div>
+        <p>Всего объявлений: <strong>${ads.length}</strong></p>
+        <div id="account-ads-list" class="grid"></div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button id="export-ads" class="btn btn--ghost">Экспортировать (console)</button>
+          <button id="clear-ads" class="btn btn--danger">Очистить мои объявления</button>
+        </div>
+      </div>
+    </section>
+  `;
+
+  const backBtn = app.querySelector('[data-link="back"]');
+  if (backBtn) backBtn.addEventListener("click", () => navigateTo("#/"));
+
+  const container = document.getElementById("account-ads-list");
+  const template = document.getElementById("card-template");
+
+  (ads || []).forEach((item) => {
+    const clone = document.importNode(template.content, true);
+    const article = clone.querySelector(".card");
+    const img = clone.querySelector(".card__image");
+    const title = clone.querySelector(".card__title");
+    const price = clone.querySelector(".card__price");
+
+    img.src = (item.images && item.images[0]) || getPlaceholderImage();
+    title.textContent = item.title;
+    price.textContent = formatPrice(item.price);
+
+    // delete action on click-hold: simple way to remove from account
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "btn btn--ghost";
+    removeBtn.style.marginTop = "8px";
+    removeBtn.textContent = "Удалить";
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!confirm("Удалить это объявление?")) return;
+      ads = ads.filter((x) => x.id !== item.id);
+      saveAds();
+      renderAccount();
+    });
+
+    const body = clone.querySelector('.card__body');
+    body.appendChild(removeBtn);
+
+    container.appendChild(clone);
+  });
+
+  const exportBtn = document.getElementById("export-ads");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      console.log(JSON.stringify(ads, null, 2));
+      alert('Объявления выведены в консоль разработчика.');
+    });
+  }
+
+  const clearBtn = document.getElementById("clear-ads");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (!confirm("Удалить ВСЕ объявления? Это действие необратимо.")) return;
+      ads = [];
+      saveAds();
+      renderAccount();
+    });
+  }
+}
+
+function renderMessages() {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <section class="page" aria-labelledby="messages-title">
+      <div class="page__header">
+        <div>
+          <h1 id="messages-title" class="page__title">Сообщения</h1>
+          <p class="page__subtitle">Здесь будут ваши сообщения (демо — функционал заглушка).</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--ghost" data-link="back">Назад</button>
+        </div>
+      </div>
+      <div>
+        <p class="page__subtitle">Нет сообщений. Это демонстрационный интерфейс.</p>
+      </div>
+    </section>
+  `;
+  app.querySelector('[data-link="back"]').addEventListener("click", () => navigateTo("#/"));
+}
+
 function saveAds() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(ads));
 }
@@ -29,6 +132,8 @@ function loadTheme() {
   const html = document.documentElement;
   if (cached === "light" || cached === "dark") {
     html.setAttribute("data-theme", cached);
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    html.setAttribute("data-theme", "light");
   } else {
     html.setAttribute("data-theme", "dark");
   }
@@ -578,6 +683,12 @@ function setupHeaderEvents() {
   );
   header.querySelectorAll("[data-link='new']").forEach((btn) =>
     btn.addEventListener("click", () => navigateTo("#/new"))
+  );
+  header.querySelectorAll("[data-link='account']").forEach((btn) =>
+    btn.addEventListener("click", () => navigateTo("#/account"))
+  );
+  header.querySelectorAll("[data-link='messages']").forEach((btn) =>
+    btn.addEventListener("click", () => navigateTo("#/messages"))
   );
 
   const searchForm = document.getElementById("search-form");
